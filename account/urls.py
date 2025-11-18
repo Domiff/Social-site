@@ -10,8 +10,7 @@ from django.contrib.auth.views import (
     PasswordResetCompleteView,
 )
 
-from account.views import user_login, dashboard, register
-
+from account.views import user_login, dashboard, register, edit
 
 app_name = "account"
 
@@ -54,4 +53,5 @@ urlpatterns = [
     # path("", include("django.contrib.auth.urls")),
     path("register", register, name="register"),
     path("", dashboard, name="dashboard"),
+    path("edit/", edit, name="edit")
 ]

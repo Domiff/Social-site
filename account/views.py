@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 
-from account.forms import LoginForm
+from account.forms import LoginForm, UserRegistrationForm
 
 
 def user_login(request: HttpRequest) -> HttpResponse:
@@ -22,7 +22,7 @@ def user_login(request: HttpRequest) -> HttpResponse:
                 else:
                     return HttpResponse("Disabled account")
             else:
-                return HttpResponse("Invalid ligin")
+                return HttpResponse("Invalid login")
     else:
         form = LoginForm()
     template_path = "account/login.html"
@@ -34,4 +34,21 @@ def user_login(request: HttpRequest) -> HttpResponse:
 def dashboard(request: HttpRequest) -> HttpResponse:
     template_path = "account/dashboard.html"
     context = {"section": "dashboard"}
+    return render(request, template_path, context)
+
+
+def register(request: HttpRequest) -> HttpResponse:
+    if request.method == "POST":
+        user_form = UserRegistrationForm(request.POST)
+        if user_form.is_valid():
+            new_user = user_form.save(commit=False)
+            new_user.set_password(user_form.cleaned_data["password"])
+            new_user.save()
+            template_path = "account/register_done.html"
+            context = {"new_user": new_user}
+            return render(request, template_path, context)
+    else:
+        user_form = UserRegistrationForm()
+    template_path = "account/register.html"
+    context = {"user_form": user_form}
     return render(request, template_path, context)

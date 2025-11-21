@@ -68,14 +68,15 @@ instance/
 
 # Scrapy stuff:
 .scrapy
-
+account/static/base.css
 # Sphinx documentation
 docs/_build/
-
+media/
 # PyBuilder
 .pybuilder/
 target/
-
+cert.crt
+cert.key
 # Jupyter Notebook
 .ipynb_checkpoints
 

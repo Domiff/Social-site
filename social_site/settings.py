@@ -12,8 +12,6 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 
-import social_core.backends.google
-from social_core.pipeline.social_auth import associate_user, associate_by_email
 from django.urls import reverse_lazy
 
 from .config import settings

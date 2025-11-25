@@ -46,10 +46,10 @@ def image_like(request: HttpRequest) -> HttpResponse:
                 image.users_like.add(request.user)
             else:
                 image.users_like.remove(request.user)
-            return JsonResponse({"status": "Ok"})
+            return JsonResponse({"status": "ok"})
         except Image.DoesNotExist:
             pass
-    return JsonResponse({"status": "Error"})
+    return JsonResponse({"status": "error"})
 
 
 @login_required
@@ -61,7 +61,7 @@ def image_list(request: HttpRequest) -> HttpResponse:
     try:
         images = paginator.page(page)
     except PageNotAnInteger:
-        image = paginator.page(1)
+        images = paginator.page(1)
     except EmptyPage:
         if images_only:
             return HttpResponse("")

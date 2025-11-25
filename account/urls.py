@@ -10,7 +10,15 @@ from django.contrib.auth.views import (
     PasswordResetCompleteView,
 )
 
-from account.views import user_login, dashboard, register, edit
+from account.views import (
+    user_login,
+    dashboard,
+    register,
+    edit,
+    users_list,
+    user_detail,
+    user_follow,
+)
 
 app_name = "account"
 
@@ -53,5 +61,8 @@ urlpatterns = [
     # path("", include("django.contrib.auth.urls")),
     path("register", register, name="register"),
     path("", dashboard, name="dashboard"),
-    path("edit/", edit, name="edit")
+    path("edit/", edit, name="edit"),
+    path("users/", users_list, name="users_list"),
+    path("users/follow/", user_follow, name="user_follow"),
+    path("users/<str:username>/", user_detail, name="user_detail"),
 ]

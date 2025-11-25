@@ -169,5 +169,11 @@ SOCIAL_AUTH_PIPELINE = [
 #
 if DEBUG:
     import mimetypes
+
     mimetypes.add_type("application/javascript", ".js", True)
     mimetypes.add_type("text/css", ".css", True)
+
+
+ABSOLUTE_URL_OVERRIDES = {
+    "auth.user": lambda u: reverse_lazy("account:user_detail", args=[u.username]),
+}

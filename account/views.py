@@ -8,6 +8,8 @@ from django.views.decorators.http import require_POST
 
 from account.forms import LoginForm, UserRegistrationForm, UserEditForm, ProfileEditForm
 from account.models import Profile, Contact
+from actions.models import Action
+from actions.utils import create_action
 
 
 def user_login(request: HttpRequest) -> HttpResponse:
@@ -33,8 +35,14 @@ def user_login(request: HttpRequest) -> HttpResponse:
 
 @login_required
 def dashboard(request: HttpRequest) -> HttpResponse:
+    actions = Action.objects.exclude(user=request.user)
+    following_ids = request.user.following.values_list("id", flat=True)
+
+    if following_ids:
+        actions = actions.filter(user_id__in=following_ids)
+    actions = actions[:10]
     template_path = "account/dashboard.html"
-    context = {"section": "dashboard"}
+    context = {"section": "dashboard", "actions": actions}
     return render(request, template_path, context)
 
 
@@ -46,6 +54,7 @@ def register(request: HttpRequest) -> HttpResponse:
             new_user.set_password(user_form.cleaned_data["password"])
             new_user.save()
             Profile.objects.create(user=new_user)
+            create_action(new_user, "has created an account")
             template_path = "account/register_done.html"
             context = {"new_user": new_user}
             return render(request, template_path, context)
@@ -104,6 +113,7 @@ def user_follow(request: HttpRequest) -> HttpResponse:
             user = User.objects.get(pk=user_id)
             if action == "follow":
                 Contact.objects.get_or_create(user_from=request.user, user_to=user)
+                create_action(request.user, "is following", user)
             else:
                 Contact.objects.filter(user_from=request.user, user_to=user).delete()
             return JsonResponse({"status": "ok"})

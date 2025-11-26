@@ -32,6 +32,10 @@ DEBUG = settings.django_debug
 ALLOWED_HOSTS = ["mysite.com", "127.0.0.1", "localhost"]
 
 
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -47,9 +51,11 @@ INSTALLED_APPS = [
     "images.apps.ImagesConfig",
     "easy_thumbnails",
     "actions.apps.ActionsConfig",
+    "debug_toolbar",
 ]
 
 MIDDLEWARE = [
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",

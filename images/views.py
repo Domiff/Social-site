@@ -4,10 +4,17 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
+from django.conf import settings
+import redis
 
 from .forms import ImageCreateForm
 from .models import Image
 from actions.utils import create_action
+
+
+r = redis.Redis(
+    host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB
+)
 
 
 @login_required
@@ -31,8 +38,10 @@ def image_create(request: HttpRequest) -> HttpResponse:
 
 def image_detail(request: HttpRequest, id: int, slug: str) -> HttpResponse:
     image = get_object_or_404(Image, id=id, slug=slug)
+    total_views = r.incr(f"image:{image.id}:views")
+    r.zincrby("image_ranking", 1, image.id)
     template_path = "images/image/detail.html"
-    context = {"section": "images", "image": image}
+    context = {"section": "images", "image": image, "total_views": total_views}
     return render(request, template_path, context)
 
 
@@ -78,3 +87,14 @@ def image_list(request: HttpRequest) -> HttpResponse:
     return render(
         request, "images/image/list.html", {"section": "images", "images": images}
     )
+
+
+@login_required
+def images_ranking(request: HttpRequest) -> HttpResponse:
+    image_ranking = r.zrange("image_ranking", 0, -1, desc=True)[0:10]
+    image_ranking_ids = [int(id) for id in image_ranking]
+    most_viewed = list(Image.objects.filter(id__in=image_ranking_ids))
+    most_viewed.sort(key=lambda image: image_ranking_ids.index(image.id))
+    template_path = "images/image/ranking.html"
+    context = {"section": "images", "most_viewed": most_viewed}
+    return render(request, template_path, context)

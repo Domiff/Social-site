@@ -96,6 +96,11 @@ DATABASES = {
 }
 
 
+REDIS_HOST = settings.redis_host
+REDIS_PORT = settings.redis_port
+REDIS_DB = settings.redis_db
+
+
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 

@@ -40,7 +40,9 @@ def dashboard(request: HttpRequest) -> HttpResponse:
 
     if following_ids:
         actions = actions.filter(user_id__in=following_ids)
-    actions = actions[:10]
+    actions = actions.select_related("user", "user__profile").prefetch_related(
+        "target"
+    )[:10]
     template_path = "account/dashboard.html"
     context = {"section": "dashboard", "actions": actions}
     return render(request, template_path, context)
